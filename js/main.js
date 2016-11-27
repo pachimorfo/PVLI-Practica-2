@@ -38,9 +38,41 @@ battle.on('start', function (data) {
 battle.on('turn', function (data) {
     console.log('TURN', data);
 
-    // TODO: render the characters
-    // TODO: highlight current character
+    // TODO: render the characters****
+    var characterIDlist = Object.keys(this._charactersById);
+    var list = document.querySelectorAll('.character-list');
+    var heroesList = list[0];
+    var monstersList = list[1];
+    var render;
+    var charct;
+	for (var i = 0; i < characterIDlist.length; i++){
+ 	 	charct = this._charactersById[characterIDlist[i]];
+ 	 	render = '<li data-chara- id="'+characterIDlist[i]+'">'+charct.name+
+ 	 	'(HP: <strong>'+charct.hp+'</strong>/'+charct.maxHp+
+ 	 	',MP: <strong>'+charct.mp+'</strong>/'+charct.maxMp+') </li>';
+ 	 	if(charct.party === 'heroes')
+ 	 		heroesList.innerHTML += render;
+ 	 	else
+ 	 		monstersList.innerHTML += render;
+ 	}
+  	// TODO: highlight current character****
+  	var charActive = document.querySelector("#"+data.activeCharacterId);
+  	charActive.classList.add('active');
     // TODO: show battle actions form
+    actionForm.style.display = 'inline';
+    var choices = actionForm.getElementsByClassName("choices");//Busca la clase con el nombre indicado dentro 
+    //de actionForm.
+    var options = battle.options.list();
+    var renderOpt;
+   	for(var i = 0; i < options.length; i++){
+    	renderOpt = '<li><label><input type="radio" name="option" value="' +options[i]+
+    	'"> ' + options[i] + '</label></li>';
+    	choices[0].innerHTML += renderOpt;
+ 	}
+
+
+
+
 });
 
 battle.on('info', function (data) {

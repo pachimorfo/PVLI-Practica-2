@@ -810,8 +810,8 @@ TurnList.prototype.next = function () {
     party: activeCharacter.party,
     activeCharacterId: this.activeCharacterId
   };
-};
 
+};
 TurnList.prototype._sortByInitiative = function () {
   var charactersById = this._charactersById;
   return Object.keys(charactersById).sort(byDecreasingInitiative);
