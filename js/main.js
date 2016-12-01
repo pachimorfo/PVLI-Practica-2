@@ -110,6 +110,7 @@ battle.on('end', function (data) {
 
     // TODO: re-render the parties so the death of the last character gets reflected
     // TODO: display 'end of battle' message, showing who won
+    infoPanel.innerHTML = 'The <strong> battle </strong> has ENDED. <strong>' +data.winner + ' </strong> won. CONGRATS'
 });
 
 window.onload = function () {
