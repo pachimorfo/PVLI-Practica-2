@@ -38,7 +38,7 @@ battle.on('start', function (data) {
 battle.on('turn', function (data) {
     console.log('TURN', data);
 
-    // TODO: render the characters****
+    // TODO: render the characters
     //Para sacar los nombres de los personajes para usarlos como ID.
     var characterIDlist = Object.keys(this._charactersById);
     var list = document.querySelectorAll('.character-list');
@@ -57,10 +57,15 @@ battle.on('turn', function (data) {
  	 		heroesList.innerHTML += render;
  	 	else
  	 		monstersList.innerHTML += render;
+ 	 	if(charct.hp <= 0){//Si la vida es 0, lo buscamos en la lista con su ID, y le añadimos el dead.
+  			var characterDead = document.querySelector('[data-chara-id="'+characterIDlist[i]+'"]');
+  			characterDead.classList.add('dead');
+  		}
  	}
-  	// TODO: highlight current character****
+  	// TODO: highlight current character
   	var charActive = document.querySelector('[data-chara-id="' + data.activeCharacterId + '"]');
   	charActive.classList.add('active');
+  	
     // TODO: show battle actions form
     actionForm.style.display = 'inline';
     var choices = actionForm.getElementsByClassName("choices");//Busca la clase con el nombre indicado dentro 
@@ -109,26 +114,34 @@ battle.on('end', function (data) {
     console.log('END', data);
 
     // TODO: re-render the parties so the death of the last character gets reflected
+ 	var characterIDlist = Object.keys(this._charactersById);
+    var list = document.querySelectorAll('.character-list');
+    var heroesList = list[0];
+    var monstersList = list[1];
+    var render = " ";
+    var charct;
+    heroesList.innerHTML = " ";
+    monstersList.innerHTML = " ";
+	for (var i = 0; i < characterIDlist.length; i++){
+ 	 	charct = this._charactersById[characterIDlist[i]];
+ 	 	render = '<li data-chara-id="'+characterIDlist[i]+'">'+charct.name+
+ 	 	'(HP: <strong>'+charct.hp+'</strong>/'+charct.maxHp+
+ 	 	',MP: <strong>'+charct.mp+'</strong>/'+charct.maxMp+') </li>';
+ 	 	if(charct.party === 'heroes')
+ 	 		heroesList.innerHTML += render;
+ 	 	else
+ 	 		monstersList.innerHTML += render;
+ 	 	if(charct.hp <= 0){//Si la vida es 0, lo buscamos en la lista con su ID, y le añadimos el dead.
+  			var characterDead = document.querySelector('[data-chara-id="'+characterIDlist[i]+'"]');
+  			characterDead.classList.add('dead');
+  		}
+ 	}
     // TODO: display 'end of battle' message, showing who won
     infoPanel.innerHTML = 'The <strong> battle </strong> has ENDED. <strong>' +data.winner + ' </strong> won. CONGRATS'
 });
 
 window.onload = function () {
-    //('.choices') es para que nos devuelva todo lo de una clase, en ese caso, la de choices
-    //Si le pones un #, buscamos por ID, idealmente solo deberia devolver un elemento. (ID unicos).
-    //Ej: battle info.
-    //Añadir cosas a algo ".innerhtml"
-    //.style.display = "none" para esconderlo, siempre va x.y.z = algo;
-    // display = "block"; para mostrar;
-    //.childNodes es cada hijo de una clase.
-    //.childNodes.lenght tamaño
-    //BUSCAR API DE NODE(de nodo, no del prog) ahi veremos el childnodes y demas
-    //Clase node, y lo mas externo es clase document.
-    //lista etiqueta ly
-    //los "activos" se subrayan solos. Solo hay que ponerlos en campo "activo" obj.setActive();
-    //lo que nos devuelve cualquier metodo de document es un nodo, asi que cuando nos devuelve algo
-    // ya luego usamos metodos del nodo(api de node).
-    actionForm = document.querySelector('form[name=select-action]');
+   	actionForm = document.querySelector('form[name=select-action]');
     targetForm = document.querySelector('form[name=select-target]');
     spellForm = document.querySelector('form[name=select-spell]');
     infoPanel = document.querySelector('#battle-info');
@@ -159,19 +172,36 @@ window.onload = function () {
  			}
         	targetForm.style.display = 'inline';        	
         }
-        else{//*******
-        	var spells = spellForm.getElementsByClassName("choices");//Busca la clase con el nombre 
+        else{
+        	var scrolls = spellForm.getElementsByClassName("choices");//Busca la clase con el nombre 
         	//indicado dentro de actionForm.
+        	var player = battle._activeCharacter;
         	var activeParty = battle._activeCharacter.party;
     		var options = battle._grimoires[activeParty];
+    		var button = spellForm.lastElementChild;
+    		button = button.firstChild;
     		var renderS;
-    		spells[0].innerHTML = " ";
-   			for(var i in options){
-    			renderS = '<li><label><input type="radio" name="option" value="' +options[i].name+
-    			'"> ' + options[i].name+ '</label></li>';
-    			spells[0].innerHTML += renderS;
- 			}
-        	spellForm.style.display = 'inline';
+    		spellForm.style.display = 'inline';
+    		if(options.hasOwnProperty('health') ){//Buscamos si el personaje activo tiene la 
+    			//propiedad de ese hechizo, en caso contrario, no le dejamos lanzar hechizos. 
+    			if(player._mp > 0){//Si el personaje actual tiene mana
+    				button.disabled = false;
+    				scrolls[0].innerHTML = " ";
+   					for(var i in options){
+    					renderS = '<li><label><input type="radio" name="option" value="' +options[i].name+
+    					'"> ' + options[i].name+ '</label></li>';
+    					scrolls[0].innerHTML += renderS;
+ 					}		
+ 				}
+ 				else{//Si no tiene mana, no le dejamos lanzar ningun hechizo
+ 					scrolls[0].innerHTML = "";
+        			button.disabled = true;
+ 				}
+        	}
+        	else{
+        		scrolls[0].innerHTML = "";
+        		button.disabled = true;
+        	}
         	
         }
 
@@ -210,8 +240,6 @@ window.onload = function () {
 		//Rellenar los targets, por que si intentas castear antes de haber ataco, que es 
 		//cuando realmente rellenas los targets, no te muestra ninguno, asi que por si acaso
 		//lo hacemos aqui tambien.       
-        
-		//SI NO HAY MANA, PONER BUTTON DISABLED
         var targets = targetForm.getElementsByClassName("choices");//Busca la clase con el nombre 
         	//indicado dentro de actionForm.
     	var options = battle.options.list();
