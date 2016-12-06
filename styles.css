@@ -97,3 +97,9 @@ button, input, select {
     box-sizing: border-box;
     padding: 1em;
 }
+.heroes{
+    background: rgba(255,64,0,0.5);
+}
+.monsters{
+    background: rgba(0,0,255,0.5);
+}

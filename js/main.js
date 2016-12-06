@@ -138,6 +138,20 @@ battle.on('end', function (data) {
  	}
     // TODO: display 'end of battle' message, showing who won
     infoPanel.innerHTML = 'The <strong> battle </strong> has ENDED. <strong>' +data.winner + ' </strong> won. CONGRATS'
+    actionForm.style.display = 'none';
+    //Recargar la pagina para empezar otra batalla.
+    //Crear botton para reinicio.
+    //Creamos un form en el html, con un boton. accedemos al boton y si pulsamos,
+    //recargamos la ventana y se empieza de nuevo.    
+    var theEnd = document.querySelector('form[name = again]');
+    theEnd.style.display = 'inline';
+    var end = theEnd.elements['option'].value;
+    battle.options.select(j);
+    if(end === 'again')
+    	 window.location.reload();
+
+
+
 });
 
 window.onload = function () {
@@ -166,9 +180,17 @@ window.onload = function () {
     		var renderT;
     		targets[0].innerHTML = " ";
    			for(var i = 0; i < options.length; i++){
-    			renderT = '<li><label><input type="radio" name="option" value="' +options[i]+
-    			'"> ' + options[i] + '</label></li>';
-    			targets[0].innerHTML += renderT;
+   				var party = battle._charactersById[options[i]].party;
+   				if(party === 'heroes'){
+	    			renderT = '<li><label class = heroes><input type="radio" name="option" value="' +options[i]+
+    				'"> ' + options[i] + '</label></li>';
+    				targets[0].innerHTML += renderT;
+   				}
+   				else{
+   					renderT = '<li><label class = monsters><input type="radio" name="option" value="' +options[i]+
+    				'"> ' + options[i] + '</label></li>';
+    				targets[0].innerHTML += renderT;
+   				}
  			}
         	targetForm.style.display = 'inline';        	
         }
@@ -240,17 +262,25 @@ window.onload = function () {
 		//Rellenar los targets, por que si intentas castear antes de haber ataco, que es 
 		//cuando realmente rellenas los targets, no te muestra ninguno, asi que por si acaso
 		//lo hacemos aqui tambien.       
-        var targets = targetForm.getElementsByClassName("choices");//Busca la clase con el nombre 
-        	//indicado dentro de actionForm.
+      	var targets = targetForm.getElementsByClassName("choices");//Busca la clase con el nombre 
+        //indicado dentro de actionForm.
     	var options = battle.options.list();
     	var renderT;
     	targets[0].innerHTML = " ";
    		for(var i = 0; i < options.length; i++){
-    		renderT = '<li><label><input type="radio" name="option" value="' +options[i]+
-    		'"> ' + options[i] + '</label></li>';
-    		targets[0].innerHTML += renderT;
+   			var party = battle._charactersById[options[i]].party;
+   			if(party === 'monsters'){
+	    		renderT = '<li><label class = monsters><input type="radio" name="option" value="' +options[i]+
+    			'"> ' + options[i] + '</label></li>';
+    			targets[0].innerHTML += renderT;
+   			}
+   			else{   				
+	    		renderT = '<li><label class = heroes><input type="radio" name="option" value="' +options[i]+
+    			'"> ' + options[i] + '</label></li>';
+    			targets[0].innerHTML += renderT;   				
+   			}
  		}
-        targetForm.style.display = 'inline'; 
+        targetForm.style.display = 'inline';  
     });
 
     spellForm.querySelector('.cancel')
